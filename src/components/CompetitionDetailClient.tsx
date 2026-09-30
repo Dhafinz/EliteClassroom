@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { requestMentorship, createTeam, joinTeam } from '@/app/actions/competitions';
+import { sendCompetitionMessage } from '@/app/actions/chat';
 import { useAuth } from '@/context/AuthContext';
 import {
   Trophy,
@@ -9,11 +10,14 @@ import {
   ExternalLink,
   BookOpen,
   Users,
+  User,
   UserPlus,
   CheckCircle2,
   AlertCircle,
   Sparkles,
   PlusCircle,
+  MessageSquare,
+  Send,
 } from 'lucide-react';
 
 interface CompetitionDetailClientProps {
@@ -30,11 +34,17 @@ export default function CompetitionDetailClient({
   const [showTeamModal, setShowTeamModal] = useState(false);
   const [showJoinModal, setShowJoinModal] = useState(false);
 
+  // Chat message state
+  const [chatText, setChatText] = useState('');
+  const [chatMessages, setChatMessages] = useState<any[]>(competition.messages || []);
+  const [sendingChat, setSendingChat] = useState(false);
+
   const [loading, setLoading] = useState(false);
   const [notification, setNotification] = useState<{ type: 'success' | 'error'; message: string } | null>(
     null
   );
 
+  const isTeam = competition.type === 'team';
   const deadlineDate = new Date(competition.deadline).toLocaleDateString('id-ID', {
     day: 'numeric',
     month: 'long',
@@ -100,6 +110,19 @@ export default function CompetitionDetailClient({
     setLoading(false);
   };
 
+  const handleSendMessage = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user || !chatText.trim()) return;
+    setSendingChat(true);
+
+    const res = await sendCompetitionMessage(competition.id, user.id, chatText);
+    if (res.success && res.data) {
+      setChatMessages((prev) => [...prev, res.data]);
+      setChatText('');
+    }
+    setSendingChat(false);
+  };
+
   return (
     <div className="space-y-6">
       {/* Toast */}
@@ -130,6 +153,21 @@ export default function CompetitionDetailClient({
           />
           <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent"></div>
 
+          {/* TOP LEFT: TULISAN "TIM" ATAU "INDIVIDU" */}
+          <div className="absolute top-4 left-4">
+            {isTeam ? (
+              <span className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#991B1B] to-[#F43F5E] text-white font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5 border border-white/20">
+                <Users className="w-4 h-4" />
+                TIM
+              </span>
+            ) : (
+              <span className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-black text-xs uppercase tracking-wider shadow-lg flex items-center gap-1.5 border border-white/20">
+                <User className="w-4 h-4" />
+                INDIVIDU
+              </span>
+            )}
+          </div>
+
           <div className="absolute bottom-6 left-6 right-6 text-white space-y-2">
             <div className="flex flex-wrap items-center gap-2">
               <span className="px-3 py-1 rounded-full bg-rose-600 font-extrabold text-xs uppercase tracking-wider">
@@ -137,9 +175,6 @@ export default function CompetitionDetailClient({
               </span>
               <span className="px-3 py-1 rounded-md bg-white/20 backdrop-blur-md text-white font-bold text-xs">
                 {competition.categoryName}
-              </span>
-              <span className="px-3 py-1 rounded-md bg-white/20 backdrop-blur-md text-white font-bold text-xs">
-                Tipe: {competition.type === 'team' ? 'Kelompok (Tim)' : 'Individu (Solo)'}
               </span>
             </div>
 
@@ -171,7 +206,7 @@ export default function CompetitionDetailClient({
               <span>Minta Guru Pembimbing</span>
             </button>
 
-            {competition.type === 'team' && (
+            {isTeam && (
               <>
                 <button
                   onClick={() => setShowTeamModal(true)}
@@ -194,44 +229,141 @@ export default function CompetitionDetailClient({
         </div>
       </div>
 
-      {/* Description & Links */}
+      {/* Kebutuhan Lomba Highlight Box */}
+      <div className="card-elite p-5 bg-gradient-to-r from-rose-50/70 via-white to-pink-50/70 border border-rose-200/80 flex items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-rose-600 text-white flex items-center justify-center shrink-0">
+            {isTeam ? <Users className="w-5 h-5" /> : <User className="w-5 h-5" />}
+          </div>
+          <div>
+            <span className="text-[10px] font-bold text-rose-700 uppercase tracking-wider block">
+              Kebutuhan & Kriteria Tim Lomba:
+            </span>
+            <p className="text-sm font-extrabold text-slate-800 mt-0.5">
+              {competition.teamRequirement || (isTeam ? '3 Orang Anggota Tim' : '1 Peserta Individu')}
+            </p>
+          </div>
+        </div>
+        <span className="hidden sm:inline-block px-3 py-1 rounded-full bg-white text-rose-700 border border-rose-200 text-xs font-bold shadow-xs">
+          {isTeam ? 'Bersifat Tim' : 'Bersifat Individu'}
+        </span>
+      </div>
+
+      {/* Main Grid: Description & KOLOM CHAT PENCARIAN TIM */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 card-elite p-6 space-y-4">
-          <h2 className="text-base font-bold text-slate-800 pb-2 border-b border-slate-100">
-            Deskripsi & Rincian Kompetisi
-          </h2>
-          <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
-            {competition.description}
-          </p>
+        {/* Left 2 cols: Description & Links */}
+        <div className="lg:col-span-2 space-y-6">
+          <div className="card-elite p-6 space-y-4">
+            <h2 className="text-base font-bold text-slate-800 pb-2 border-b border-slate-100">
+              Deskripsi & Rincian Kompetisi
+            </h2>
+            <p className="text-xs sm:text-sm text-slate-600 leading-relaxed whitespace-pre-line">
+              {competition.description}
+            </p>
 
-          <div className="pt-4 flex flex-wrap gap-3">
-            {competition.linkRegistration && (
-              <a
-                href={competition.linkRegistration}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-primary-crimson text-xs py-2 px-4 inline-flex items-center gap-1.5"
-              >
-                <span>Link Registrasi Resmi</span>
-                <ExternalLink className="w-3.5 h-3.5" />
-              </a>
-            )}
+            <div className="pt-4 flex flex-wrap gap-3">
+              {competition.linkRegistration && (
+                <a
+                  href={competition.linkRegistration}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-primary-crimson text-xs py-2 px-4 inline-flex items-center gap-1.5"
+                >
+                  <span>Link Registrasi Resmi</span>
+                  <ExternalLink className="w-3.5 h-3.5" />
+                </a>
+              )}
 
-            {competition.guidebookLink && (
-              <a
-                href={competition.guidebookLink}
-                target="_blank"
-                rel="noreferrer"
-                className="btn-secondary-white text-xs py-2 px-4 inline-flex items-center gap-1.5"
+              {competition.guidebookLink && (
+                <a
+                  href={competition.guidebookLink}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="btn-secondary-white text-xs py-2 px-4 inline-flex items-center gap-1.5"
+                >
+                  <BookOpen className="w-3.5 h-3.5" />
+                  <span>Unduh Buku Panduan</span>
+                </a>
+              )}
+            </div>
+          </div>
+
+          {/* KOLOM CHAT DI SETIAP LOMBA (PENCARIAN TIM / ANGGOTA) */}
+          <div className="card-elite p-6 space-y-4">
+            <div className="flex items-center justify-between pb-3 border-b border-slate-100">
+              <div className="flex items-center gap-2">
+                <MessageSquare className="w-5 h-5 text-[#8B0000]" />
+                <div>
+                  <h3 className="text-sm font-bold text-slate-800">
+                    Forum Chat & Pencarian Rekan Tim Lomba
+                  </h3>
+                  <p className="text-[11px] text-slate-400">
+                    Kekurangan anggota atau belum punya tim? Infokan dan cari rekan di sini!
+                  </p>
+                </div>
+              </div>
+              <span className="text-xs font-bold text-rose-600 bg-rose-50 px-2.5 py-1 rounded-full">
+                {chatMessages.length} Pesan
+              </span>
+            </div>
+
+            {/* Chat Messages Stream */}
+            <div className="space-y-3 max-h-72 overflow-y-auto pr-1">
+              {chatMessages.length === 0 ? (
+                <div className="p-6 text-center text-slate-400 text-xs italic bg-slate-50 rounded-xl">
+                  Belum ada pesan di forum lomba ini. Jadilah yang pertama mengajak rekan tim!
+                </div>
+              ) : (
+                chatMessages.map((msg: any) => {
+                  const isMe = user?.id === msg.userId;
+                  const timeStr = new Date(msg.createdAt).toLocaleTimeString('id-ID', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                  });
+
+                  return (
+                    <div
+                      key={msg.id}
+                      className={`p-3 rounded-2xl text-xs space-y-1 ${
+                        isMe
+                          ? 'bg-rose-50/90 border border-rose-200 ml-6 text-slate-800'
+                          : 'bg-slate-50 border border-slate-200 mr-6 text-slate-800'
+                      }`}
+                    >
+                      <div className="flex items-center justify-between gap-2">
+                        <span className="font-bold text-[#8B0000]">
+                          {msg.user?.name || 'Siswa'} {isMe && '(Anda)'}
+                        </span>
+                        <span className="text-[10px] text-slate-400">{timeStr}</span>
+                      </div>
+                      <p className="leading-relaxed">{msg.message}</p>
+                    </div>
+                  );
+                })
+              )}
+            </div>
+
+            {/* Input Form Send Message */}
+            <form onSubmit={handleSendMessage} className="flex gap-2 pt-2 border-t border-slate-100">
+              <input
+                value={chatText}
+                onChange={(e) => setChatText(e.target.value)}
+                placeholder="Tulis pesan... Contoh: 'Tim kami butuh 1 UI/UX, ada yang berminat?'"
+                className="flex-1 px-4 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-rose-400 focus:bg-white"
+              />
+              <button
+                type="submit"
+                disabled={sendingChat || !chatText.trim()}
+                className="btn-accent-rose text-xs py-2 px-4 shadow-sm"
               >
-                <BookOpen className="w-3.5 h-3.5" />
-                <span>Unduh Buku Panduan</span>
-              </a>
-            )}
+                <Send className="w-3.5 h-3.5" />
+                <span>Kirim</span>
+              </button>
+            </form>
           </div>
         </div>
 
-        {/* Existing Teams in Competition */}
+        {/* Right col: Existing Teams in Competition */}
         <div className="card-elite p-6 space-y-4 h-fit">
           <h3 className="text-sm font-bold text-slate-800 pb-2 border-b border-slate-100 flex items-center justify-between">
             <span>Tim Terdaftar</span>
@@ -241,16 +373,21 @@ export default function CompetitionDetailClient({
           {competition.teams && competition.teams.length > 0 ? (
             <div className="space-y-2.5">
               {competition.teams.map((t: any) => (
-                <div key={t.id} className="p-3 rounded-xl bg-slate-50 border border-slate-100 text-xs">
+                <div key={t.id} className="p-3.5 rounded-xl bg-slate-50 border border-slate-100 text-xs space-y-1">
                   <p className="font-bold text-slate-800">{t.name}</p>
-                  <p className="text-[11px] text-slate-500 font-mono mt-0.5">
+                  <p className="text-[11px] text-slate-500 font-mono">
                     Kode Undangan: <span className="font-bold text-[#8B0000]">{t.inviteCode}</span>
                   </p>
+                  {t.members && (
+                    <p className="text-[10px] text-slate-400">
+                      {t.members.length} Anggota Terdaftar
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
           ) : (
-            <p className="text-xs text-slate-400 italic">Belum ada tim yang terdaftar. Ayo jadi tim pertama!</p>
+            <p className="text-xs text-slate-400 italic">Belum ada tim yang terdaftar. Ayo bentuk tim pertama!</p>
           )}
         </div>
       </div>
@@ -376,7 +513,7 @@ export default function CompetitionDetailClient({
                 <input
                   name="inviteCode"
                   required
-                  placeholder="Contoh: ELT-789"
+                  placeholder="Contoh: ELT-89X"
                   className="w-full px-3.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-mono uppercase"
                 />
               </div>

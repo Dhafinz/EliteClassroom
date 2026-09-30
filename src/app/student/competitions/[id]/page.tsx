@@ -27,6 +27,10 @@ export default async function CompetitionDetailPage({
         teams: {
           include: { members: { include: { user: true } } },
         },
+        messages: {
+          include: { user: true },
+          orderBy: { createdAt: 'asc' },
+        },
       },
     }),
     prisma.user.findMany({

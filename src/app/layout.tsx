@@ -14,6 +14,8 @@ export const metadata: Metadata = {
     'Platform terpadu pembelajaran interaktif, bimbingan prestasi lomba guru, dan gamifikasi reward XP untuk Pelajar dan Guru.',
 };
 
+import Providers from '@/components/Providers';
+
 export default function RootLayout({
   children,
 }: {
@@ -22,7 +24,7 @@ export default function RootLayout({
   return (
     <html lang="id" className={`${plusJakartaSans.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-[#F8FAFC] text-slate-900 font-sans">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

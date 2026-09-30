@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '@/context/AuthContext';
 import {
+  GraduationCap,
   LayoutDashboard,
   Video,
   HelpCircle,
@@ -18,6 +19,8 @@ import {
   Activity,
   ShieldCheck,
   Sparkles,
+  LogOut,
+  FileText,
 } from 'lucide-react';
 
 interface SidebarLink {
@@ -30,7 +33,7 @@ interface SidebarLink {
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
   const role = user?.role || 'student';
 
   const studentLinks: SidebarLink[] = [
@@ -45,7 +48,7 @@ export default function Sidebar() {
 
   const teacherLinks: SidebarLink[] = [
     { label: 'Beranda Guru', href: '/', icon: LayoutDashboard },
-    { label: 'Studio Materi YouTube', href: '/teacher/studio', icon: Video, badge: 'HD Auto' },
+    { label: 'Studio Materi & Dokumen', href: '/teacher/studio', icon: Video, badge: 'YouTube/Doc' },
     { label: 'Mentorship Hub', href: '/teacher/mentorship', icon: Users, badge: 'Inbox' },
     { label: 'Rekap Nilai & XP Murid', href: '/teacher/students', icon: BookOpen },
     { label: 'Katalog Lomba Sekolah', href: '/student/competitions', icon: Trophy },
@@ -74,35 +77,35 @@ export default function Sidebar() {
       : studentLinks;
 
   return (
-    <aside className="w-64 shrink-0 hidden md:block">
-      <div className="sticky top-20 bg-white rounded-2xl border border-slate-100 p-4 shadow-sm flex flex-col gap-6">
-        {/* Role Badge Indicator */}
-        <div className="p-3 rounded-xl bg-gradient-to-r from-rose-50 to-slate-50 border border-rose-100">
-          <p className="text-[10px] font-bold text-slate-400 uppercase tracking-wider">
-            Portal Aktif
-          </p>
-          <div className="flex items-center justify-between mt-1">
-            <span className="text-xs font-bold text-[#8B0000] capitalize flex items-center gap-1.5">
-              <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping"></span>
+    <aside className="fixed top-0 bottom-0 left-0 w-64 bg-white border-r border-slate-200 z-40 hidden md:flex flex-col justify-between shadow-xs">
+      {/* Top: Brand Header */}
+      <div className="flex flex-col">
+        <div className="h-16 flex items-center px-5 border-b border-slate-100 gap-3">
+          <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-[#991B1B] via-[#8B0000] to-[#E11D48] flex items-center justify-center text-white shadow-md shadow-rose-900/20 shrink-0">
+            <GraduationCap className="w-5 h-5" />
+          </div>
+          <div className="truncate">
+            <span className="font-black text-sm tracking-tight bg-gradient-to-r from-[#8B0000] to-[#E11D48] bg-clip-text text-transparent block">
+              ELITE CLASSROOM
+            </span>
+            <span className="text-[10px] text-slate-400 font-semibold block truncate">
               {role === 'student'
                 ? 'Portal Pelajar'
                 : role === 'teacher'
-                ? 'Portal Guru / Mentor'
+                ? 'Portal Guru Mentor'
                 : role === 'admin'
                 ? 'Portal Administrator'
                 : 'Portal Developer'}
             </span>
-            <span className="text-[10px] font-semibold px-2 py-0.5 rounded-full bg-white text-slate-600 border border-slate-200">
-              v1.0
-            </span>
           </div>
         </div>
 
-        {/* Navigation Menu */}
-        <nav className="flex flex-col gap-1">
-          <p className="text-[11px] font-bold text-slate-400 px-3 py-1 uppercase tracking-wider">
-            Menu Utama
+        {/* Navigation Menu Links */}
+        <div className="p-3 space-y-1 overflow-y-auto max-h-[calc(100vh-170px)]">
+          <p className="text-[10px] font-bold text-slate-400 px-3 py-1.5 uppercase tracking-wider">
+            Menu Navigasi
           </p>
+
           {activeLinks.map((link) => {
             const isActive = pathname === link.href;
             const Icon = link.icon;
@@ -119,17 +122,17 @@ export default function Sidebar() {
                     : 'text-slate-600 hover:bg-slate-50 hover:text-slate-900'
                 }`}
               >
-                <div className="flex items-center gap-2.5">
+                <div className="flex items-center gap-2.5 truncate">
                   <Icon
-                    className={`w-4 h-4 ${
+                    className={`w-4 h-4 shrink-0 ${
                       isActive ? 'text-white' : link.highlight ? 'text-rose-600' : 'text-slate-400'
                     }`}
                   />
-                  <span>{link.label}</span>
+                  <span className="truncate">{link.label}</span>
                 </div>
                 {link.badge && (
                   <span
-                    className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md ${
+                    className={`text-[9px] font-extrabold px-1.5 py-0.5 rounded-md shrink-0 ${
                       isActive
                         ? 'bg-white/20 text-white'
                         : 'bg-rose-100 text-rose-700'
@@ -141,25 +144,42 @@ export default function Sidebar() {
               </Link>
             );
           })}
-        </nav>
+        </div>
+      </div>
 
-        {/* Motivational Card for Students */}
-        {role === 'student' && (
-          <div className="p-3.5 rounded-xl bg-gradient-to-br from-[#8B0000] to-[#E11D48] text-white shadow-md shadow-rose-900/15">
-            <div className="flex items-center gap-1.5 text-xs font-bold mb-1">
-              <Sparkles className="w-4 h-4 text-amber-300" />
-              <span>Ayo Raih Juara!</span>
+      {/* Bottom: User Card & Logout */}
+      <div className="p-3 border-t border-slate-100 bg-slate-50/60">
+        {user ? (
+          <div className="flex items-center justify-between gap-2 p-2 rounded-xl bg-white border border-slate-200 shadow-xs">
+            <div className="flex items-center gap-2 truncate">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-[#8B0000] to-[#F43F5E] text-white flex items-center justify-center font-bold text-xs shrink-0 shadow-xs">
+                {user.name.charAt(0)}
+              </div>
+              <div className="truncate text-left">
+                <p className="text-xs font-bold text-slate-800 leading-tight truncate">
+                  {user.name}
+                </p>
+                <p className="text-[10px] text-slate-400 truncate">
+                  {user.email}
+                </p>
+              </div>
             </div>
-            <p className="text-[11px] text-rose-100 leading-relaxed mb-3">
-              Tonton video belajar (+3 XP), temukan lomba baru, dan minta bimbingan guru.
-            </p>
-            <Link
-              href="/student/competitions/submit"
-              className="block text-center py-1.5 px-3 bg-white text-[#8B0000] font-bold text-[11px] rounded-lg hover:bg-rose-50 transition-colors shadow-xs"
+
+            <button
+              onClick={logout}
+              title="Keluar / Ganti Akun"
+              className="p-1.5 rounded-lg text-slate-400 hover:text-rose-600 hover:bg-rose-50 transition-colors shrink-0"
             >
-              + Usulkan Lomba Baru
-            </Link>
+              <LogOut className="w-4 h-4" />
+            </button>
           </div>
+        ) : (
+          <Link
+            href="/login"
+            className="w-full btn-primary-crimson text-xs py-2 block text-center"
+          >
+            Masuk ke Akun
+          </Link>
         )}
       </div>
     </aside>

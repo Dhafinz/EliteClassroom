@@ -33,6 +33,8 @@ model User {
   mentorshipsAsStudent Mentorship[]      @relation("StudentMentee")
   teamsLed            Team[]             @relation("TeamLeader")
   teamMembers         TeamMember[]
+  messages            CompetitionMessage[]
+  notifications       Notification[]
 
   @@map("users")
 }
@@ -47,6 +49,7 @@ model Competition {
   organizer          String
   level              String   // sekolah | kota | provinsi | nasional | internasional
   type               String   @default("solo") // solo | team
+  teamRequirement    String?  @default("1-3 Anggota Tim") @map("team_requirement") // Kebutuhan lomba misal "3 Anggota (1 Frontend, 1 Backend, 1 UI/UX)"
   description        String?
   linkRegistration   String?  @map("link_registration")
   guidebookLink      String?  @map("guidebook_link")
@@ -63,8 +66,37 @@ model Competition {
   creator            User     @relation("CompetitionCreator", fields: [createdBy], references: [id])
   participations     Participation[]
   teams              Team[]
+  messages           CompetitionMessage[]
 
   @@map("competitions")
+}
+
+model CompetitionMessage {
+  id            Int          @id @default(autoincrement())
+  competitionId Int          @map("competition_id")
+  userId        Int          @map("user_id")
+  message       String
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  competition   Competition  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  user          User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("competition_messages")
+}
+
+model Notification {
+  id        Int      @id @default(autoincrement())
+  userId    Int      @map("user_id")
+  title     String
+  message   String
+  type      String   @default("info") // "xp" | "competition" | "mentorship" | "chat"
+  link      String?
+  isRead    Boolean  @default(false) @map("is_read")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("notifications")
 }
 
 model LearningMaterial {
@@ -72,11 +104,13 @@ model LearningMaterial {
   teacherId   Int      @map("teacher_id")
   title       String
   description String
-  type        String   // "youtube" | "pdf" | "article"
+  type        String   @default("youtube") // "youtube" | "pdf" | "word" | "article"
+  fileFormat  String?  @default("video") @map("file_format") // "video" | "pdf" | "word"
   youtubeUrl  String?  @map("youtube_url")
   youtubeId   String?  @map("youtube_id")
   thumbnail   String?
   fileUrl     String?  @map("file_url")
+  content     String?  // Rangkuman dokumen / materi Word/PDF
   xpReward    Int      @default(3) @map("xp_reward")
   category    String   @default("Umum")
   createdAt   DateTime @default(now()) @map("created_at")
@@ -97,8 +131,8 @@ model MaterialProgress {
   completedAt DateTime? @map("completed_at")
   createdAt   DateTime  @default(now()) @map("created_at")
 
-  student     User             @relation(fields: [studentId], references: [id])
-  material    LearningMaterial @relation(fields: [materialId], references: [id])
+  student     User             @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  material    LearningMaterial @relation(fields: [materialId], references: [id], onDelete: Cascade)
 
   @@unique([studentId, materialId])
   @@map("material_progresses")
@@ -146,8 +180,8 @@ model QuizAttempt {
   xpEarned    Int      @default(0) @map("xp_earned")
   submittedAt DateTime @default(now()) @map("submitted_at")
 
-  student     User     @relation(fields: [studentId], references: [id])
-  quiz        Quiz     @relation(fields: [quizId], references: [id])
+  student     User     @relation(fields: [studentId], references: [id], onDelete: Cascade)
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
 
   @@map("quiz_attempts")
 }
@@ -160,8 +194,8 @@ model Team {
   inviteCode    String       @unique @map("invite_code")
   createdAt     DateTime     @default(now()) @map("created_at")
 
-  competition   Competition  @relation(fields: [competitionId], references: [id])
-  leader        User         @relation("TeamLeader", fields: [leaderId], references: [id])
+  competition   Competition  @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  leader        User         @relation("TeamLeader", fields: [leaderId], references: [id], onDelete: Cascade)
   members       TeamMember[]
 
   @@map("teams")
@@ -175,7 +209,7 @@ model TeamMember {
   joinedAt  DateTime @default(now()) @map("joined_at")
 
   team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
-  user      User     @relation(fields: [userId], references: [id])
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@unique([teamId, userId])
   @@map("team_members")
@@ -191,8 +225,8 @@ model Mentorship {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  teacher     User     @relation("TeacherMentor", fields: [teacherId], references: [id])
-  student     User     @relation("StudentMentee", fields: [studentId], references: [id])
+  teacher     User     @relation("TeacherMentor", fields: [teacherId], references: [id], onDelete: Cascade)
+  student     User     @relation("StudentMentee", fields: [studentId], references: [id], onDelete: Cascade)
 
   @@map("mentorships")
 }
@@ -206,8 +240,8 @@ model Participation {
   certificate   String?
   createdAt     DateTime    @default(now()) @map("created_at")
 
-  competition   Competition @relation(fields: [competitionId], references: [id])
-  user          User        @relation(fields: [userId], references: [id])
+  competition   Competition @relation(fields: [competitionId], references: [id], onDelete: Cascade)
+  user          User        @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("participations")
 }

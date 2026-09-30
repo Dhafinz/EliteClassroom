@@ -62,11 +62,23 @@ export async function claimMaterialXp(studentId: number, materialId: number) {
         },
       });
 
+      // Create notification
+      await tx.notification.create({
+        data: {
+          userId: studentId,
+          title: '✨ Reward XP Masuk!',
+          message: `Selamat! Anda berhasil mengklaim +${xpToAdd} XP dari materi "${material.title}".`,
+          type: 'xp',
+          link: `/student/learn/${materialId}`,
+        },
+      });
+
       return { progress, newXp: updatedUser.xp };
     });
 
     revalidatePath('/dashboard/student');
-    revalidatePath(`/dashboard/student/learn/${materialId}`);
+    revalidatePath('/student/learn');
+    revalidatePath(`/student/learn/${materialId}`);
     return {
       success: true,
       message: `Selamat! +${xpToAdd} XP berhasil ditambahkan ke profil Anda! 🎉`,
@@ -104,6 +116,7 @@ export async function createYouTubeMaterial(formData: FormData) {
         title,
         description,
         type: 'youtube',
+        fileFormat: 'video',
         youtubeUrl,
         youtubeId: videoId,
         thumbnail,
@@ -112,12 +125,54 @@ export async function createYouTubeMaterial(formData: FormData) {
       },
     });
 
-    revalidatePath('/dashboard/teacher/studio');
-    revalidatePath('/dashboard/student/learn');
+    revalidatePath('/teacher/studio');
+    revalidatePath('/student/learn');
     return { success: true, message: 'Materi video YouTube berhasil diterbitkan!', material: newMaterial };
   } catch (error) {
     console.error('Error creating YouTube material:', error);
     return { success: false, message: 'Terjadi kesalahan saat menyimpan materi.' };
+  }
+}
+
+export async function createDocumentMaterial(formData: FormData) {
+  try {
+    const teacherId = Number(formData.get('teacherId'));
+    const title = String(formData.get('title') || '').trim();
+    const description = String(formData.get('description') || '').trim();
+    const category = String(formData.get('category') || 'Teknologi');
+    const format = String(formData.get('format') || 'word'); // "word" | "pdf"
+    const content = String(formData.get('content') || '').trim();
+    const fileUrl = String(formData.get('fileUrl') || '').trim();
+    const xpReward = Number(formData.get('xpReward') || 3);
+
+    if (!title || (!content && !fileUrl)) {
+      return { success: false, message: 'Judul dan konten materi dokumen wajib diisi.' };
+    }
+
+    const newMaterial = await prisma.learningMaterial.create({
+      data: {
+        teacherId,
+        title,
+        description,
+        type: format,
+        fileFormat: format,
+        category,
+        content,
+        fileUrl: fileUrl || (format === 'pdf' ? '/docs/panduan.pdf' : '/docs/modul.docx'),
+        xpReward,
+      },
+    });
+
+    revalidatePath('/teacher/studio');
+    revalidatePath('/student/learn');
+    return {
+      success: true,
+      message: `Materi dokumen ${format.toUpperCase()} berhasil diterbitkan untuk siswa!`,
+      material: newMaterial,
+    };
+  } catch (error) {
+    console.error('Error creating document material:', error);
+    return { success: false, message: 'Terjadi kesalahan saat menyimpan materi dokumen.' };
   }
 }
 
@@ -171,6 +226,17 @@ export async function submitQuizAttempt(
           where: { id: studentId },
           data: {
             xp: { increment: xpEarned },
+          },
+        });
+
+        // Add notification
+        await tx.notification.create({
+          data: {
+            userId: studentId,
+            title: '🏆 Kuis Selesai & XP Diperoleh!',
+            message: `Skor Anda ${score}%. Anda memperoleh +${xpEarned} XP dari kuis "${quiz.title}".`,
+            type: 'xp',
+            link: `/student/quiz/${quizId}`,
           },
         });
       }

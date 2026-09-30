@@ -11,8 +11,8 @@
 | **Tagline Produk** | *Next-Gen Learning Space & Collaborative Achievement Hub for Students and Teachers* |
 | **Tipe Dokumen** | Product Requirements Document (PRD) — Single Source of Truth |
 | **Status Dokumen** | **APPROVED & ACTIVE** |
-| **Versi Dokumen** | **v1.0.0** |
-| **Framework & Tech** | **Next.js 15 (App Router, TypeScript), Prisma ORM (SQLite Engine), Modern CSS/Tailwind** |
+| **Versi Dokumen** | **v1.1.0 (Revisi Implementasi Tampilan, Autentikasi, Lomba & Dokumen)** |
+| **Framework & Tech** | **Next.js 16 (App Router, TypeScript), Prisma ORM (SQLite Engine), Modern CSS/Tailwind** |
 | **Database Engine** | **SQLite (`file:./dev.db`) — Zero-Config Local Storage** |
 | **Target Pengguna Utama** | **Pelajar (Siswa) & Guru (Pendidik / Mentor Lomba)** |
 | **Pengguna Sekunder** | **Administrator Sekolah & Web Developer (System Architect)** |
@@ -414,5 +414,32 @@ gantt
 
 ---
 
+## 11. DOKUMENTASI REVISI v1.1.0 (USER REVISION SPECIFICATIONS)
+
+Berdasarkan arahan perbaikan pengguna, spesifikasi v1.1.0 mengintegrasikan 6 fitur revisi esensial:
+
+1. **Struktur Layout & Posisi Sidebar**:
+   - Sidebar diposisikan tetap di pojok paling kiri layar (`fixed left-0 top-0 bottom-0 w-64`) untuk memaksimalkan kenyamanan navigasi dan estetika visual desktop (`md:pl-64`).
+2. **Sistem Login Guard & Akun Bawaan (Pre-seeded Accounts)**:
+   - Akses web mewajibkan login terlebih dahulu melalui `LoginPage` dan `AuthContext` global.
+   - Akun pra-konfigurasi untuk setiap role:
+     - **Siswa**: `dhafin@eliteclassroom.com` (Dhafin Kautsar, Level 3 Scholar, 420 XP).
+     - **Guru**: `budi@eliteclassroom.com` (Budi Santoso, S.Kom., Pembimbing Lomba).
+     - **Admin**: `admin@eliteclassroom.com` (Siti Rahma, S.Pd., Kepala Kurikulum).
+     - **Dev**: `dev@eliteclassroom.com` (Reza Pratama, Lead System Architect).
+3. **Penyempurnaan Eksplorasi Lomba**:
+   - **Badge Partisipasi**: Di pojok kiri atas setiap kartu lomba dicantumkan label status tegas `👥 TIM` atau `👤 INDIVIDU`.
+   - **Spesifikasi Kebutuhan Tim**: Menampilkan rincian kebutuhan keanggotaan (contoh: "3 Orang: Frontend, Backend, UI/UX").
+   - **Forum Chat / Kolom Pencarian Tim**: Setiap halaman detail lomba dilengkapi modul chat interaktif real-time bagi siswa untuk mencari anggota tim atau mengabarkan kekurangan formasi tim.
+4. **Pusat Notifikasi Fungsional**:
+   - Lonceng notifikasi di Navbar kini interaktif dengan popover dropdown, badge jumlah notifikasi belum dibaca, dan sinkronisasi real-time via API `/api/notifications`.
+5. **Output Status Penyelesaian Ruang Belajar**:
+   - Video atau modul dokumen yang telah selesai dipelajari menampilkan output visual tegas: **"SELESAI DIPELAJARI / DILIHAT ✅"** beserta riwayat klaim reward XP.
+6. **Ekspansi Format Modul Belajar (Dokumen Word & PDF)**:
+   - Studio Guru dan Ruang Belajar Siswa kini mendukung materi berbasis dokumen Word (.docx) dan PDF dilengkapi pembaca dokumen *in-app* dan klaim reward +3 XP.
+
+---
+
 > **Pernyataan Penutup**:  
 > Dokumen PRD ini menjadi panduan spesifikasi resmi untuk pembangunan platform **Elite Classroom**. Seluruh arsitektur kode Next.js, komponen antarmuka pengguna, dan integrasi logika bisnis wajib merujuk secara konsisten pada butir-butir ketentuan di dalam dokumen ini.
+
