@@ -1,0 +1,213 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                  Int       @id @default(autoincrement())
+  name                String
+  email               String    @unique
+  password            String
+  role                String    @default("student") // "student" | "teacher" | "admin" | "developer"
+  nisNip              String?   @map("nis_nip")
+  className           String?   @map("class_name")
+  department          String?
+  photo               String?   @default("default-avatar.png")
+  waNumber            String?   @map("wa_number")
+  xp                  Int       @default(0)
+  createdAt           DateTime  @default(now()) @map("created_at")
+  updatedAt           DateTime  @updatedAt @map("updated_at")
+
+  createdMaterials    LearningMaterial[] @relation("TeacherMaterials")
+  createdQuizzes      Quiz[]             @relation("TeacherQuizzes")
+  materialProgresses  MaterialProgress[]
+  quizAttempts        QuizAttempt[]
+  
+  submittedComps      Competition[]      @relation("CompetitionCreator")
+  participations      Participation[]
+  mentorshipsAsMentor Mentorship[]       @relation("TeacherMentor")
+  mentorshipsAsStudent Mentorship[]      @relation("StudentMentee")
+  teamsLed            Team[]             @relation("TeamLeader")
+  teamMembers         TeamMember[]
+
+  @@map("users")
+}
+
+model Competition {
+  id                 Int      @id @default(autoincrement())
+  categoryId         Int      @default(1) @map("category_id")
+  fieldId            Int      @default(1) @map("field_id")
+  categoryName       String   @default("Teknologi") @map("category_name")
+  createdBy          Int      @map("created_by")
+  title              String
+  organizer          String
+  level              String   // sekolah | kota | provinsi | nasional | internasional
+  type               String   @default("solo") // solo | team
+  description        String?
+  linkRegistration   String?  @map("link_registration")
+  guidebookLink      String?  @map("guidebook_link")
+  poster             String?
+  deadline           DateTime
+  
+  verificationStatus String   @default("pending") @map("verification_status") // pending | approved | rejected
+  rejectionReason    String?  @map("rejection_reason")
+  approvedBy         Int?     @map("approved_by")
+  
+  createdAt          DateTime @default(now()) @map("created_at")
+  updatedAt          DateTime @updatedAt @map("updated_at")
+
+  creator            User     @relation("CompetitionCreator", fields: [createdBy], references: [id])
+  participations     Participation[]
+  teams              Team[]
+
+  @@map("competitions")
+}
+
+model LearningMaterial {
+  id          Int      @id @default(autoincrement())
+  teacherId   Int      @map("teacher_id")
+  title       String
+  description String
+  type        String   // "youtube" | "pdf" | "article"
+  youtubeUrl  String?  @map("youtube_url")
+  youtubeId   String?  @map("youtube_id")
+  thumbnail   String?
+  fileUrl     String?  @map("file_url")
+  xpReward    Int      @default(3) @map("xp_reward")
+  category    String   @default("Umum")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  teacher     User     @relation("TeacherMaterials", fields: [teacherId], references: [id])
+  progresses  MaterialProgress[]
+
+  @@map("learning_materials")
+}
+
+model MaterialProgress {
+  id          Int       @id @default(autoincrement())
+  studentId   Int       @map("student_id")
+  materialId  Int       @map("material_id")
+  isCompleted Boolean   @default(false) @map("is_completed")
+  xpEarned    Int       @default(0) @map("xp_earned")
+  completedAt DateTime? @map("completed_at")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  student     User             @relation(fields: [studentId], references: [id])
+  material    LearningMaterial @relation(fields: [materialId], references: [id])
+
+  @@unique([studentId, materialId])
+  @@map("material_progresses")
+}
+
+model Quiz {
+  id          Int      @id @default(autoincrement())
+  teacherId   Int      @map("teacher_id")
+  title       String
+  description String
+  category    String   @default("Umum")
+  timeLimit   Int      @default(15)
+  xpReward    Int      @default(10) @map("xp_reward")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  teacher     User            @relation("TeacherQuizzes", fields: [teacherId], references: [id])
+  questions   QuizQuestion[]
+  attempts    QuizAttempt[]
+
+  @@map("quizzes")
+}
+
+model QuizQuestion {
+  id          Int      @id @default(autoincrement())
+  quizId      Int      @map("quiz_id")
+  question    String
+  optionA     String   @map("option_a")
+  optionB     String   @map("option_b")
+  optionC     String   @map("option_c")
+  optionD     String   @map("option_d")
+  correctKey  String   @map("correct_key") // "A" | "B" | "C" | "D"
+  explanation String?
+
+  quiz        Quiz     @relation(fields: [quizId], references: [id], onDelete: Cascade)
+
+  @@map("quiz_questions")
+}
+
+model QuizAttempt {
+  id          Int      @id @default(autoincrement())
+  studentId   Int      @map("student_id")
+  quizId      Int      @map("quiz_id")
+  score       Int      @default(0)
+  xpEarned    Int      @default(0) @map("xp_earned")
+  submittedAt DateTime @default(now()) @map("submitted_at")
+
+  student     User     @relation(fields: [studentId], references: [id])
+  quiz        Quiz     @relation(fields: [quizId], references: [id])
+
+  @@map("quiz_attempts")
+}
+
+model Team {
+  id            Int          @id @default(autoincrement())
+  competitionId Int          @map("competition_id")
+  leaderId      Int          @map("leader_id")
+  name          String
+  inviteCode    String       @unique @map("invite_code")
+  createdAt     DateTime     @default(now()) @map("created_at")
+
+  competition   Competition  @relation(fields: [competitionId], references: [id])
+  leader        User         @relation("TeamLeader", fields: [leaderId], references: [id])
+  members       TeamMember[]
+
+  @@map("teams")
+}
+
+model TeamMember {
+  id        Int      @id @default(autoincrement())
+  teamId    Int      @map("team_id")
+  userId    Int      @map("user_id")
+  role      String   @default("member")
+  joinedAt  DateTime @default(now()) @map("joined_at")
+
+  team      Team     @relation(fields: [teamId], references: [id], onDelete: Cascade)
+  user      User     @relation(fields: [userId], references: [id])
+
+  @@unique([teamId, userId])
+  @@map("team_members")
+}
+
+model Mentorship {
+  id          Int      @id @default(autoincrement())
+  teacherId   Int      @map("teacher_id")
+  studentId   Int      @map("student_id")
+  field       String
+  notes       String?
+  status      String   @default("active") // pending | active | completed
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  teacher     User     @relation("TeacherMentor", fields: [teacherId], references: [id])
+  student     User     @relation("StudentMentee", fields: [studentId], references: [id])
+
+  @@map("mentorships")
+}
+
+model Participation {
+  id            Int         @id @default(autoincrement())
+  competitionId Int         @map("competition_id")
+  userId        Int         @map("user_id")
+  stage         String      @default("persiapan") // persiapan | bimbingan | penyisihan | final | juara
+  achievement   String?     // Juara 1 | Juara 2 | Juara 3 | Finalis
+  certificate   String?
+  createdAt     DateTime    @default(now()) @map("created_at")
+
+  competition   Competition @relation(fields: [competitionId], references: [id])
+  user          User        @relation(fields: [userId], references: [id])
+
+  @@map("participations")
+}
