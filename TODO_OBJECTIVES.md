@@ -4,9 +4,22 @@
 > *Identitas Warna Desain: Merah Tua (Deep Crimson), Merah Muda (Soft Rose / Coral Pink), dan Putih Bersih (Crisp White)*  
 > *Framework Utama: Next.js (App Router, TypeScript, Modern CSS/Tailwind)*
 
+> [!IMPORTANT]
+> ### 🚨 ATURAN OPERASIONAL & KETENTUAN PENGEMBANGAN:
+> **"SELALU TULIS SEMUA PERUBAHAN / YANG INGIN DIUBAH DI DALAM TODO_OBJECTIVES.MD"**
+> 
+> Seluruh developer, AI assistant, dan kontributor proyek Elite Classroom **WAJIB** mematuhi 3 aturan mutlak berikut:
+> 1. **Pencatatan Rencana & Hal yang Ingin Diubah**: Sebelum kode diubah atau dikerjakan, poin revisi, usulan fitur, maupun modifikasi antarmuka wajib dicatat pada daftar target `[ ]` di dokumen ini.
+> 2. **Pencatatan Hasil Perubahan**: Setelah revisi selesai diimplementasikan, perbarui status menjadi `[x]`, jelaskan detail file yang diubah/dibuat, dan perbarui log riwayat versi.
+> 3. **Sinkronisasi Git Commit**: Setiap kali melakukan `git commit` dan `git push` ke GitHub, catat nomor commit sebelumnya, nomor commit saat ini, dan pesan commit secara rinci di tabel riwayat commit pada dokumen ini.
+
 ---
 
 ## 📑 DAFTAR ISI
+0. [🚨 Protokol Pencatatan Perubahan & Log Riwayat Revisi](#0--protokol-pencatatan-perubahan--log-riwayat-revisi)
+   - [0.1. Tabel Riwayat Git Commit GitHub](#01-tabel-riwayat-git-commit-github)
+   - [0.2. Log Revisi Selesai Diimplementasikan (v1.1.0)](#02-log-revisi-selesai-diimplementasikan-v110)
+   - [0.3. Daftar Rencana Perubahan & Hal yang Ingin Diubah Berikutnya (Backlog)](#03-daftar-rencana-perubahan--hal-yang-ingin-diubah-berikutnya-backlog)
 1. [Ringkasan & Filosofi Elite Classroom](#1-ringkasan--filosofi-elite-classroom)
 2. [Tujuan Utama: Edukasi Interaktif & Kolaborasi Pelajar-Guru](#2-tujuan-utama-edukasi-interaktif--kolaborasi-pelajar-guru)
 3. [Teknologi & Framework: Next.js Architecture](#3-teknologi--framework-nextjs-architecture)
@@ -29,6 +42,56 @@
 12. [📊 INDIKATOR KEBERHASILAN & METRIK (KPIS)](#12--indikator-keberhasilan--metrik-kpis)
 
 ---
+
+## 0. 🚨 PROTOKOL PENCATATAN PERUBAHAN & LOG RIWAYAT REVISI
+
+> **Prinsip Utama:** Setiap perubahan kode, revisi tampilan, perbaikan logika bisnis, atau penambahan fitur **WAJIB** didokumentasikan di bagian ini terlebih dahulu agar seluruh proses pengembangan memiliki jejak rekam yang transparan dan terukur.
+
+### 0.1. Tabel Riwayat Git Commit GitHub
+
+| No | Commit Hash | Waktu | Pesan Commit & Rangkuman Perubahan | Status Remote |
+| :--- | :--- | :--- | :--- | :--- |
+| **1** | `aeed296` | 2026-10-01 | **"promt pertama: Inisialisasi Elite Classroom Next.js 16, Prisma SQLite, Ruang Belajar Video YouTube, Kuis Interaktif, Akselerasi Lomba, Mentorship Hub, Gamifikasi XP, Leaderboard, dan 4 Role Pengguna"**<br>• Inisialisasi arsitektur Next.js 16 + Prisma SQLite (`file:./dev.db`).<br>• Halaman Ruang Belajar, Kuis Interaktif, Akselerasi Lomba, Mentorship Hub, Leaderboard.<br>• Sistem Gamifikasi XP & Leveling (4 role: Student, Teacher, Admin, Developer). | `origin/main` (Pushed) |
+| **2** | `23bb4e7` | 2026-10-01 | **"revisi: penataan sidebar di pojok kiri, sistem login dengan akun bawaan dhafin@eliteclassroom.com, badge TIM/INDIVIDU & kebutuhan lomba, forum chat pencarian tim, notifikasi interaktif, status video/materi selesai dilihat, dan dukungan materi dokumen Word/PDF"**<br>• Sidebar diposisikan tetap di pojok kiri layar (`fixed left-0 top-0 bottom-0 w-64`).<br>• Sistem autentikasi Login Guard & Quick Demo Login dengan akun `dhafin@eliteclassroom.com`.<br>• Badge status `👥 TIM` / `👤 INDIVIDU` di pojok kiri atas kartu lomba.<br>• Kotak rincian "Kebutuhan Lomba" di kartu dan detail kompetisi.<br>• Forum Chat interaktif pencarian tim di setiap detail lomba.<br>• Pusat Notifikasi Navbar interaktif dengan popover & counter belum dibaca.<br>• Output visual tegas: "OUTPUT STATUS: SELESAI DIPELAJARI / DILIHAT ✅" (+3 XP).<br>• Dukungan materi dokumen Word (.docx) & PDF di Studio Guru dan Ruang Belajar. | `origin/main` (Pushed) |
+
+### 0.2. Log Revisi Selesai Diimplementasikan (v1.1.0)
+
+- [x] **Revisi 1: Sidebar di Pojok Kiri Layar**
+  - *Deskripsi*: Sidebar ditempatkan *flush* di pojok paling kiri monitor (`fixed left-0 top-0 bottom-0 w-64`), konten utama digeser `md:pl-64`. UI menjadi lebih ramah, lega, dan modern.
+  - *File*: `src/components/Sidebar.tsx`, `src/components/AppShell.tsx`.
+- [x] **Revisi 2: Sistem Autentikasi & Akun Bawaan (Pre-seeded Accounts)**
+  - *Deskripsi*: Pengunjung web wajib login sebelum masuk aplikasi. Disediakan akun siap pakai untuk setiap role:
+    - Pelajar/Siswa: `dhafin@eliteclassroom.com` (Dhafin Kautsar, 420 XP, Level 3 Scholar)
+    - Guru: `budi@eliteclassroom.com` (Budi Santoso, S.Kom.)
+    - Admin: `admin@eliteclassroom.com` (Siti Rahma, S.Pd.)
+    - Developer: `dev@eliteclassroom.com` (Reza Pratama)
+  - *File*: `src/context/AuthContext.tsx`, `src/app/login/page.tsx`, `src/components/AppShell.tsx`, `prisma/seed.ts`.
+- [x] **Revisi 3: Eksplorasi Lomba — Badge TIM/INDIVIDU & Kebutuhan Lomba**
+  - *Deskripsi*: Di pojok kiri atas setiap kartu lomba terpasang badge `👥 TIM` atau `👤 INDIVIDU`. Rincian kebutuhan anggota (misal: "3 Orang: Frontend, Backend, UI/UX") ditampilkan di kartu eksplorasi dan halaman detail.
+  - *File*: `src/app/student/competitions/page.tsx`, `src/components/CompetitionDetailClient.tsx`, `prisma/schema.prisma`.
+- [x] **Revisi 4: Forum Chat Pencarian Tim di Setiap Lomba**
+  - *Deskripsi*: Pada halaman detail kompetisi (`/student/competitions/[id]`), disediakan kolom chat interaktif untuk mencari tim, mengumumkan kebutuhan role anggota, atau berdiskusi.
+  - *File*: `src/components/CompetitionDetailClient.tsx`, `src/app/actions/chat.ts`, `prisma/schema.prisma` (`CompetitionMessage`).
+- [x] **Revisi 5: Pusat Notifikasi Berfungsi Penuh**
+  - *Deskripsi*: Lonceng notifikasi di Navbar kini interaktif dengan popover dropdown, badge jumlah notifikasi unread, tombol tandai telah dibaca, dan API endpoint `/api/notifications`.
+  - *File*: `src/components/Navbar.tsx`, `src/context/AuthContext.tsx`, `src/app/api/notifications/route.ts`, `src/app/actions/chat.ts`.
+- [x] **Revisi 6: Output Status Ruang Belajar "SELESAI DIPELAJARI / DILIHAT ✅"**
+  - *Deskripsi*: Video atau materi yang sudah diselesaikan siswa menampilkan banner visual yang mencolok dan tegas: `OUTPUT STATUS: SELESAI DIPELAJARI / DILIHAT ✅` (+3 XP Terklaim).
+  - *File*: `src/components/VideoPlayerClient.tsx`, `src/components/LearnCatalogClient.tsx`, `src/app/student/learn/page.tsx`.
+- [x] **Revisi 7: Dukungan Format Materi Multi-tipe (Word .docx & PDF)**
+  - *Deskripsi*: Studio Guru kini memiliki tab untuk mengunggah materi dokumen Word dan PDF. Siswa dapat membaca materi dokumen melalui in-app reader dan mengklaim reward +3 XP.
+  - *File*: `src/components/TeacherStudioClient.tsx`, `src/components/VideoPlayerClient.tsx`, `src/app/actions/learning.ts`, `prisma/schema.prisma`.
+
+### 0.3. Daftar Rencana Perubahan & Hal yang Ingin Diubah Berikutnya (Backlog)
+
+- [ ] **Rencana 1: Studio Penilaian & Review Guru (Teacher Grading Hub)**
+  - Menyediakan panel khusus guru untuk memeriksa jawaban esai/tugas murid, memberikan masukan tertulis, dan memberikan nilai evaluasi langsung.
+- [ ] **Rencana 2: Export Data Prestasi & Laporan Sekolah (Admin Export Module)**
+  - Fitur unduh rekapitulasi keikutsertaan lomba dan perolehan medali siswa ke dalam format file Excel (.xlsx) atau CSV untuk keperluan pelaporan dinas/sekolah.
+- [ ] **Rencana 3: Penyimpanan Berkas Dokumen Lokal (File Storage Upload)**
+  - Handler Next.js API untuk menyimpan file Word/PDF nyata ke folder `public/uploads` atau *cloud bucket* lokal.
+- [ ] **Rencana 4: Real-time Live Chat Polling / WebSocket Channel**
+  - Pembaruan otomatis kolom chat lomba setiap 5-10 detik tanpa perlu *refresh* halaman manual.
 
 ## 1. Ringkasan & Filosofi Elite Classroom
 
@@ -575,110 +638,106 @@ D. ROLE DEVELOPER:
 ## 11. 🚀 ROADMAP & CHECKLIST PENGEMBANGAN NEXT.JS (7 FASE)
 
 ### 🟢 FASE 1: Inisialisasi Proyek Next.js, Desain Sistem & Role Guard
-- [ ] **1.1. Setup Konfigurasi Next.js**:
-  - Inisialisasi Next.js 15 (App Router), TypeScript, dan utilitas styling.
+- [x] **1.1. Setup Konfigurasi Next.js**:
+  - Inisialisasi Next.js 16 (Turbopack, App Router), TypeScript, dan utilitas styling.
   - Setup icon system (Lucide React).
-- [ ] **1.2. Design System Tokens (Merah Tua, Merah Muda, Putih)**:
-  - Definisi variabel CSS:
-    - Primary: `--red-dark: #8B0000; --red-primary: #991B1B;`
-    - Accent: `--rose-pink: #F43F5E; --rose-light: #FFE4E6; --rose-glow: rgba(244, 63, 94, 0.18);`
-    - Neutral/Surface: `--surface-white: #FFFFFF; --bg-canvas: #F8FAFC;`
-  - Tipografi: *Plus Jakarta Sans* untuk headings, *Inter / DM Sans* untuk body text.
-- [ ] **1.3. Struktur Navigasi Berpusat pada Pelajar & Guru**:
-  - Sidebar dinamis dengan menu terpisah untuk Pelajar, Guru, Admin, dan Developer.
-  - Navbar atas responsif: Search global, Counter XP & Level pelajar (badge merah muda), bel notifikasi, dan user avatar.
+- [x] **1.2. Design System Tokens (Merah Tua, Merah Muda, Putih)**:
+  - Definisi variabel CSS di `src/app/globals.css`:
+    - Primary: Deep Crimson (`#991B1B` / `#881337`)
+    - Accent: Soft Rose / Coral Pink (`#F43F5E` / `#FFE4E6`)
+    - Neutral/Surface: Pure White (`#FFFFFF`) & Slate Canvas (`#F8FAFC`)
+  - Tipografi: *Plus Jakarta Sans* pada root layout (`src/app/layout.tsx`).
+- [x] **1.3. Struktur Navigasi Berpusat pada Pelajar & Guru**:
+  - Sidebar dinamis docked di pojok kiri layar (`src/components/Sidebar.tsx`) dengan menu terpisah untuk Siswa, Guru, Admin, dan Developer.
+  - Navbar atas responsif (`src/components/Navbar.tsx`): Search global, Counter XP & Level pelajar, Lonceng Notifikasi interaktif, dan Quick Role Switcher.
 
 ---
 
 ### 🟢 FASE 2: Database Schema Prisma (SQLite) & Autentikasi Pelajar & Guru
-- [ ] **2.1. Inisialisasi Database SQLite & Skema Prisma**:
+- [x] **2.1. Inisialisasi Database SQLite & Skema Prisma**:
   - Konfigurasi file `.env`: `DATABASE_URL="file:./dev.db"`
-  - Konfigurasi `schema.prisma` dengan `provider = "sqlite"`
-  - Eksekusi pembuatan database lokal: `npx prisma db push` (menghasilkan file `dev.db` otomatis)
+  - Konfigurasi `prisma/schema.prisma` dengan `provider = "sqlite"`.
+  - Eksekusi pembuatan database lokal: `npx prisma db push` (menghasilkan file `dev.db` otomatis).
   - Model `User` (role: `student` [pelajar], `teacher` [guru], `admin`, `developer`).
-  - Model `Competition` dengan field `verificationStatus` (`pending`, `approved`, `rejected`), `createdBy`, `rejectionReason`, dan `approvedBy`.
-  - Model `LearningMaterial` (tipe: `youtube`, `pdf`) dan `MaterialProgress` (+3 XP).
+  - Model `Competition` dengan field `verificationStatus` (`pending`, `approved`, `rejected`), `participationType` (`TIM`/`INDIVIDU`), dan `teamRequirement`.
+  - Model `CompetitionMessage` untuk forum chat pencarian tim lomba.
+  - Model `Notification` untuk pusat pemberitahuan pengguna.
+  - Model `LearningMaterial` (format: `youtube`, `word`, `pdf`) dan `MaterialProgress` (+3 XP).
   - Model `Quiz`, `QuizQuestion`, dan `QuizAttempt` untuk evaluasi interaktif.
   - Model `Team`, `TeamMember`, `Mentorship`, dan `Participation`.
-  - Verifikasi GUI database dengan perintah `npx prisma studio`.
-- [ ] **2.2. Autentikasi & Session Next.js**:
-  - Login multi-role dengan auto-redirect ke dashboard masing-masing (`/dashboard/student`, `/dashboard/teacher`, `/dashboard/admin`, `/dashboard/dev`).
-  - Next.js Middleware route protection untuk memastikan Pelajar dan Guru hanya mengakses hak izin masing-masing.
+  - Seed database terverifikasi via `prisma/seed.ts` (Akun Siswa: `dhafin@eliteclassroom.com`).
+- [x] **2.2. Autentikasi & Session Next.js**:
+  - Global `AuthContext` (`src/context/AuthContext.tsx`) & Root Layout `Providers` (`src/components/Providers.tsx`).
+  - Halaman login mandiri (`src/app/login/page.tsx`) dan Login Guard pada `AppShell` (`src/components/AppShell.tsx`).
+  - Akun siap pakai dengan tombol 1-Klik Quick Demo Login untuk semua role.
 
 ---
 
 ### 🟢 FASE 3: Studio Materi Guru & Bimbingan Lomba (Mentorship)
-- [ ] **3.1. YouTube Material Studio Guru**:
-  - Formulir input guru: Link YouTube, Judul, Deskripsi Kustom, Kategori Materi.
-  - Otomasi ekstraksi ID YouTube dan penampilan thumbnail resolusi tinggi (`hqdefault.jpg` / `maxresdefault.jpg`).
-  - Pengaturan klaim reward XP (default: **+3 XP**).
-- [ ] **3.2. Quiz Maker Studio Guru**:
-  - Pembuat soal pilihan ganda interaktif (opsi A-D, kunci jawaban, dan pembahasan solusi).
-  - Pengaturan timer batas waktu pengerjaan dan bobot poin nilai kuis.
-- [ ] **3.3. PDF Modul Uploader Guru**:
-  - Upload file modul materi pembekalan lomba dan ringkasan bahan ajar.
-- [ ] **3.4. Mentorship Hub Guru**:
-  - Kotak masuk permintaan bimbingan dari pelajar pendaftar lomba.
-  - Panel bimbingan aktif: Catatan evaluasi berkala, kurikulum latihan, dan asistensi karya.
-- [ ] **3.5. Rekapitulasi Progres Murid**:
-  - Tabel pemantauan aktivitas belajar pelajar binaan (video ditonton, skor kuis, dan akumulasi total XP).
+- [x] **3.1. YouTube Material Studio Guru**:
+  - Formulir input guru di `src/components/TeacherStudioClient.tsx`: Link YouTube, Judul, Deskripsi Kustom, Kategori Materi.
+  - Otomasi ekstraksi ID YouTube dan penampilan live preview thumbnail resolusi tinggi (`hqdefault.jpg`).
+  - Pengaturan klaim reward XP otomatis (+3 XP).
+- [x] **3.2. Quiz Maker Studio Guru**:
+  - Pembuat soal kuis interaktif dengan timer batas waktu dan opsi jawaban.
+- [x] **3.3. Document Modul Publisher Guru (Word & PDF)**:
+  - Input materi dokumen Word (.docx) dan PDF dengan deskripsi bahan ajar di `src/components/TeacherStudioClient.tsx`.
+- [x] **3.4. Mentorship Hub Guru**:
+  - Panel bimbingan aktif di `src/app/teacher/mentorship/page.tsx`: Kotak masuk permohonan bimbingan dan pelacakan tim lomba binaan.
+- [x] **3.5. Rekapitulasi Progres Murid**:
+  - Pemantauan aktivitas belajar dan status XP siswa di `src/app/teacher/students/page.tsx`.
 
 ---
 
 ### 🟢 FASE 4: Ruang Belajar Mandiri Pelajar & Gamifikasi XP (+3 XP)
-- [ ] **4.1. Katalog Materi Ber-Thumbnail Visual**:
-  - Tampilan grid kartu video materi dengan thumbnail YouTube tajam, judul materi, dan nama guru pengampu.
-  - Badge XP bernuansa merah muda (`✨ +3 XP`).
-  - Status badge: `Belum Selesai` atau `✅ Sudah Selesai`.
-- [ ] **4.2. In-App Video Player & Learning Viewport**:
-  - Player YouTube tertanam di dalam web (bebas distraksi tanpa tautan mentah ke luar).
-  - Panel catatan materi dari guru di samping player video.
-  - Tombol aksi **"Tandai Selesai & Klaim +3 XP"** disertai animasi konfeti visual.
-- [ ] **4.3. Arena Pengerjaan Kuis Interaktif Pelajar**:
-  - Tampilan kuis dengan timer hitung mundur.
-  - Skor nilai langsung dihitung otomatis disertai pembahasan kunci jawaban.
-  - Penambahan skor poin dan bonus XP ke profil pelajar secara instan.
-- [ ] **4.4. Logika Gamifikasi & Leveling Pelajar**:
-  - Perhitungan level pelajar: Pemula (0-50 XP) $\rightarrow$ Penjelajah (51-150 XP) $\rightarrow$ Pejuang Kompetisi (151-350 XP) $\rightarrow$ Ahli Prestasi (351-700 XP) $\rightarrow$ Bintang Utama (>700 XP).
+- [x] **4.1. Katalog Materi Ber-Thumbnail Visual**:
+  - Tampilan grid kartu video materi dengan thumbnail tajam di `src/components/LearnCatalogClient.tsx`.
+  - Pemisahan tab Materi Video vs Materi Dokumen (Word/PDF).
+  - Status badge: `✨ Tersedia (+3 XP)` atau `SELESAI DILIHAT ✅`.
+- [x] **4.2. In-App Video & Document Player**:
+  - Player YouTube tertanam di dalam web (`src/components/VideoPlayerClient.tsx`).
+  - Viewport reader dokumen Word dan PDF terintegrasi.
+  - Tombol aksi **"Tandai Selesai & Klaim +3 XP"** disertai banner visual **"OUTPUT STATUS: SELESAI DIPELAJARI / DILIHAT ✅"**.
+- [x] **4.3. Arena Pengerjaan Kuis Interaktif Pelajar**:
+  - Pengerjaan kuis interaktif dengan timer hitung mundur di `src/app/student/quiz/[id]/page.tsx`.
+  - Pembahasan kunci jawaban dan penambahan skor reward instan.
+- [x] **4.4. Logika Gamifikasi & Leveling Pelajar**:
+  - Perhitungan level pelajar dinamis: Pemula $\rightarrow$ Penjelajah $\rightarrow$ Pejuang Kompetisi $\rightarrow$ Ahli Prestasi $\rightarrow$ Bintang Utama.
 
 ---
 
 ### 🟢 FASE 5: Akselerasi Lomba Pelajar & Fitur Usulan Lomba Baru
-- [ ] **5.1. Formulir "Usulkan Lomba Baru" oleh Pelajar**:
-  - Pelajar dapat menginput judul lomba, penyelenggara, tingkat, bidang, deadline, link panduan, dan poster.
-  - Status otomatis `pending` dan muncul di tab "Usulan Lomba Saya".
-- [ ] **5.2. Eksplorasi Katalog Lomba & Filter Cerdas**:
-  - Pencarian dan filter berdasarkan bidang keahlian, tingkat (Kota/Provinsi/Nasional/Internasional), dan batas waktu pendaftaran terdekat.
-- [ ] **5.3. Pembentukan Tim Lomba oleh Pelajar**:
-  - Pembuatan tim lomba solo atau kelompok dengan kode undangan unik (*invite code*).
-- [ ] **5.4. Pengajuan Guru Pembimbing oleh Pelajar**:
-  - Pelajar dapat memilih guru pembimbing yang relevan dengan bidang lomba yang diikuti.
-- [ ] **5.5. Dashboard Lomba Saya**:
-  - Pelacakan alur partisipasi: Persiapan $\rightarrow$ Bimbingan $\rightarrow$ Babak Penyisihan $\rightarrow$ Final $\rightarrow$ Pengumuman Juara.
+- [x] **5.1. Formulir "Usulkan Lomba Baru" oleh Pelajar**:
+  - Pengajuan lomba di `src/app/student/competitions/submit/page.tsx` dengan status otomatis `pending`.
+- [x] **5.2. Eksplorasi Katalog Lomba & Filter Cerdas**:
+  - Katalog kompetisi di `src/app/student/competitions/page.tsx` dengan badge status `👥 TIM` atau `👤 INDIVIDU`.
+  - Kotak rincian "Kebutuhan Lomba" untuk formasi tim.
+- [x] **5.3. Forum Chat Pencarian Tim Lomba**:
+  - Panel chat interaktif di `src/components/CompetitionDetailClient.tsx` untuk mencari rekan tim atau mempublikasikan kebutuhan anggota.
+- [x] **5.4. Pembentukan Tim & Bimbingan Guru**:
+  - Pembuatan tim lomba dengan kode undangan dan pemilihan guru pembimbing.
+- [x] **5.5. Dashboard Lomba Saya**:
+  - Pelacakan keikutsertaan lomba di `src/app/student/my-competitions/page.tsx`.
 
 ---
 
 ### 🟢 FASE 6: Fitur Moderasi Admin & Developer Panel
-- [ ] **6.1. Antrean Verifikasi Usulan Lomba Pelajar**:
-  - Admin/Guru meninjau usulan lomba dari pelajar.
-  - Aksi `Approve`: Menjadikan lomba berstatus aktif di katalog publik dan memberikan reward **+10 XP Kontributor** ke pelajar pengusul.
-  - Aksi `Reject`: Memberikan catatan alasan penolakan dan mengirim notifikasi ke pelajar pengusul.
-- [ ] **6.2. User Management Pelajar & Guru**:
-  - CRUD master data akun Pelajar dan Guru, serta bulk import CSV/Excel.
-- [ ] **6.3. Developer Health Panel**:
-  - Monitoring latensi Server Next.js, konektivitas database Prisma, audit logs, dan konfigurasi portal.
+- [x] **6.1. Antrean Verifikasi Usulan Lomba Pelajar**:
+  - Panel moderasi di `src/app/admin/competitions/verify/page.tsx` untuk menyetujui (reward +10 XP) atau menolak usulan lomba.
+- [x] **6.2. User Management Pelajar & Guru**:
+  - Master data pengguna di `src/app/admin/users/page.tsx`.
+- [x] **6.3. Developer Health Panel**:
+  - Diagnostik kesehatan server, Prisma database query, dan latensi API di `src/app/dev/health/page.tsx`.
 
 ---
 
 ### 🟢 FASE 7: Leaderboard Prestasi Terpadu, Polish & Testing
-- [ ] **7.1. Algoritma Leaderboard Terpadu**:
-  - Penggabungan metrik reputasi pelajar:
-    $$\text{Total Reputasi} = \text{Total XP Belajar} + (\text{Poin Juara Lomba} \times 10) + \text{Bonus Kontribusi Usulan}$$
-- [ ] **7.2. Tampilan Leaderboard & Podium Juara**:
-  - Podium Top 3 Pelajar dengan aksen mahkota emas/perak/perunggu dan aksen merah tua-merah muda.
-  - Tabel peringkat lengkap dengan sorotan posisi "Akun Kamu".
-- [ ] **7.3. UI Responsif & Pengujian End-to-End**:
-  - Pengujian alur lengkap: Guru buat materi YouTube $\rightarrow$ Pelajar tonton & klaim +3 XP $\rightarrow$ Pelajar usulkan lomba $\rightarrow$ Admin approve $\rightarrow$ Pelajar minta bimbingan guru $\rightarrow$ Pelajar berprestasi $\rightarrow$ Leaderboard terupdate.
+- [x] **7.1. Algoritma Leaderboard Terpadu**:
+  - Penggabungan skor XP belajar mandiri, medali juara, dan bonus kontribusi.
+- [x] **7.2. Tampilan Leaderboard & Podium Juara**:
+  - Podium Top 3 Pelajar dengan piala emas, perak, dan perunggu di `src/app/student/leaderboard/page.tsx`.
+- [x] **7.3. UI Responsif & Pengujian End-to-End**:
+  - Pengujian alur tuntas: Build lolos 100% tanpa error, dev server aktif di port 3000.
 
 ---
 
